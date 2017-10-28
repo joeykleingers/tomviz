@@ -434,7 +434,8 @@ target_link_libraries(tomvizlib
     vtkjsoncpp
     vtkpugixml
     tomvizExtensions
-    Qt5::Network)
+    Qt5::Network
+    SIMPL::SIMPLib)
 if(WIN32)
   target_link_libraries(tomvizlib PUBLIC Qt5::WinMain)
 endif()

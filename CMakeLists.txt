@@ -118,6 +118,10 @@ if(ITK_FOUND AND NOT SKIP_PARAVIEW_ITK_PYTHON_CHECKS)
   endif()
 endif()
 
+find_package(HDF5)
+find_package(SIMPL)
+
+
 add_subdirectory(tomviz)
 
 option(ENABLE_TESTING "Enable testing and building the tests." OFF)
