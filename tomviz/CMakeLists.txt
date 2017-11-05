@@ -419,6 +419,8 @@ configure_file(tomvizConfig.h.in tomvizConfig.h @ONLY)
 configure_file(tomvizPythonConfig.h.in tomvizPythonConfig.h @ONLY)
 
 add_library(tomvizlib STATIC ${SOURCES} ${accel_srcs})
+target_include_directories(tomvizlib PUBLIC ${SIMPL_INCLUDE_DIRS})
+target_link_libraries(tomvizlib PRIVATE SIMPL::SIMPLib)
 set_target_properties(tomvizlib PROPERTIES OUTPUT_NAME tomviz)
 
 set_property(TARGET tomvizlib PROPERTY POSITION_INDEPENDENT_CODE TRUE)
@@ -434,8 +436,7 @@ target_link_libraries(tomvizlib
     vtkjsoncpp
     vtkpugixml
     tomvizExtensions
-    Qt5::Network
-    SIMPL::SIMPLib)
+    Qt5::Network)
 if(WIN32)
   target_link_libraries(tomvizlib PUBLIC Qt5::WinMain)
 endif()
