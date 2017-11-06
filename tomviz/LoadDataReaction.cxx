@@ -48,6 +48,10 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
+#include "SIMPLib/Utilities/SIMPLH5DataReader.h"
+#include "SIMPLib/DataContainers/DataContainerArrayProxy.h"
+#include "SIMPLib/DataContainers/DataContainerArray.h"
+
 namespace tomviz {
 
 LoadDataReaction::LoadDataReaction(QAction* parentObject)
@@ -83,6 +87,7 @@ QList<DataSource*> LoadDataReaction::loadData()
     << "MRC files (*.mrc *.st *.rec *.ali)"
     << "XDMF files (*.xmf *.xdmf)"
     << "Text files (*.txt)"
+    << "DREAM.3D files (*.dream3d)"
     << "All files (*.*)";
 
   QFileDialog dialog(nullptr);
@@ -122,6 +127,12 @@ DataSource* LoadDataReaction::loadData(const QStringList& fileNames,
   if (info.suffix().toLower() == "emd") {
     // Load the file using our simple EMD class.
     dataSource = createDataSourceLocal(fileName, defaultModules, child);
+    if (addToRecent && dataSource) {
+      RecentFilesMenu::pushDataReader(dataSource, nullptr);
+    }
+  } else if (info.suffix().toLower() == "dream3d") {
+    // Load the SIMPL file.
+    dataSource = createSIMPLDataSource(fileName, defaultModules, child);
     if (addToRecent && dataSource) {
       RecentFilesMenu::pushDataReader(dataSource, nullptr);
     }
@@ -178,6 +189,24 @@ DataSource* LoadDataReaction::createDataSourceLocal(const QString& fileName,
     }
   }
   return nullptr;
+}
+
+DataSource* LoadDataReaction::createSIMPLDataSource(const QString& fileName,
+                                                    bool defaultModules,
+                                                    bool child)
+{
+  vtkSmartPointer<vtkSMProxy> source;
+  SIMPLH5DataReader* simplReader = new SIMPLH5DataReader();
+  simplReader->openFile(fileName);
+  DataContainerArrayProxy proxy;
+  DataContainerArray::Pointer dca = DataContainerArray::New();
+  simplReader->readDataContainerArrayStructure(proxy);
+  if (simplReader->readDREAM3DData(false, proxy, dca.get()) == false)
+  {
+
+  }
+
+  simplReader->closeFile();
 }
 
 namespace {

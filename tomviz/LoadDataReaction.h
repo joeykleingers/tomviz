@@ -51,6 +51,10 @@ public:
                                            bool defaultModules = true,
                                            bool child = false);
 
+  static DataSource* createSIMPLDataSource(const QString& fileName,
+                                           bool defaultModules = true,
+                                           bool child = false);
+
   static QList<DataSource*> loadData();
 
   /// Load a data file from the specified location.

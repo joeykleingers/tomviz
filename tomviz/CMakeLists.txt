@@ -178,6 +178,14 @@ set(SOURCES
   SetTiltAnglesOperator.h
   SetTiltAnglesReaction.cxx
   SetTiltAnglesReaction.h
+  SIMPLDataListWidgetItem.cxx
+  SIMPLDataListWidgetItem.h
+  SIMPLDataListWidgetItemDelegate.cxx
+  SIMPLDataListWidgetItemDelegate.h
+  SIMPLDataListWidgetModel.cxx
+  SIMPLDataListWidgetModel.h
+  SIMPLDataSelectionDialog.cxx
+  SIMPLDataSelectionDialog.h
   SnapshotOperator.h
   SnapshotOperator.cxx
   SpinBox.cxx
