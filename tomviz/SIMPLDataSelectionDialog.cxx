@@ -100,6 +100,7 @@ void SIMPLDataSelectionDialog::createConnections()
 {
   connect(m_ui->importBtn, &QPushButton::clicked, [=] { accept(); });
   connect(m_ui->cancelBtn, &QPushButton::clicked, [=] { reject(); });
+  connect(m_ui->listView, &QListView::doubleClicked, [=] { accept(); });
 }
 
 QString SIMPLDataSelectionDialog::getSelectedDataArrayPath()
