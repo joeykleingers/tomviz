@@ -61,7 +61,7 @@ void SIMPLDataSelectionDialog::setupGui()
   SIMPLDataListWidgetItemDelegate* delegate = new SIMPLDataListWidgetItemDelegate(m_ui->listView);
   m_ui->listView->setItemDelegate(delegate);
 
-//  m_ui->importBtn->setEnabled(false);
+  m_ui->importBtn->setEnabled(false);
 
   createConnections();
 }
@@ -87,18 +87,19 @@ void SIMPLDataSelectionDialog::setDataArrayPaths(QList<DataArrayPath> daPaths)
   }
 
   m_ui->listView->setModel(model);
+
+  // Connection that enables/disables the selection button if the current item is valid/invalid
+  connect(m_ui->listView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=] (const QItemSelection &cur, const QItemSelection &prev) {
+    Q_UNUSED(prev)
+
+    m_ui->importBtn->setDisabled(cur.isEmpty());
+  });
 }
 
 void SIMPLDataSelectionDialog::createConnections()
 {
   connect(m_ui->importBtn, &QPushButton::clicked, [=] { accept(); });
   connect(m_ui->cancelBtn, &QPushButton::clicked, [=] { reject(); });
-
-//  connect(m_ui->listView->selectionModel(), &QItemSelectionModel::currentChanged, this, [=] (const QModelIndex &cur, const QModelIndex &prev) {
-//    Q_UNUSED(prev)
-
-//    m_ui->importBtn->setEnabled(cur.isValid());
-//  });
 }
 
 QString SIMPLDataSelectionDialog::getSelectedDataArrayPath()
