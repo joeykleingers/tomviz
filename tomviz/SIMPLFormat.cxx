@@ -78,15 +78,17 @@ bool SIMPLFormat::read(const QString &fileName, vtkImageData* image)
     if (fileId < 0) {
       return false;
     }
-    HDF5ScopedFileSentinel sentinel(&fileId, true);
 
     hid_t dcGrpId = H5Gopen(fileId, SIMPL::StringConstants::DataContainerGroupName.toStdString().c_str(), H5P_DEFAULT);
     if (dcGrpId < 0) {
+      H5Fclose(fileId);
       return false;
     }
-    sentinel.addGroupId(&dcGrpId);
 
     bool readResult = readData(dcGrpId, daPath, image);
+
+    H5Gclose(dcGrpId);
+    H5Fclose(fileId);
     return readResult;
   }
 
@@ -101,16 +103,16 @@ bool SIMPLFormat::readData(hid_t locId, const QString &path, vtkImageData* data)
   if (datasetId < 0) {
     return false;
   }
-  HDF5ScopedGroupSentinel sentinel(&datasetId, true);
 
   hid_t dataspaceId = H5Dget_space(datasetId);
   if (dataspaceId < 0) {
+    H5Dclose(datasetId);
     return false;
   }
-  sentinel.addGroupId(&dataspaceId);
 
   int dimCount = H5Sget_simple_extent_ndims(dataspaceId);
   if (dimCount < 1) {
+    H5Dclose(datasetId);
     return false;
   }
 
@@ -130,7 +132,6 @@ bool SIMPLFormat::readData(hid_t locId, const QString &path, vtkImageData* data)
   // probably add more, but I got the important ones for testing in first.
   int vtkDataType = VTK_FLOAT;
   hid_t dataTypeId = H5Dget_type(datasetId);
-  sentinel.addGroupId(&dataTypeId);
   hid_t memTypeId = 0;
 
   if (H5Tequal(dataTypeId, H5T_IEEE_F64LE)) {
@@ -160,6 +161,7 @@ bool SIMPLFormat::readData(hid_t locId, const QString &path, vtkImageData* data)
   } else {
     // Not accounted for, fail for now, should probably improve this soon.
     std::cout << "Unknown type encountered!" << dataTypeId << std::endl;
+    H5Dclose(datasetId);
     return false;
   }
 
@@ -170,6 +172,7 @@ bool SIMPLFormat::readData(hid_t locId, const QString &path, vtkImageData* data)
           data->GetScalarPointer());
   data->Modified();
 
+  H5Dclose(datasetId);
   return true;
 }
 
