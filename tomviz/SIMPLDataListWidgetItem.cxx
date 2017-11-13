@@ -41,9 +41,8 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-SIMPLDataListWidgetItem::SIMPLDataListWidgetItem(const QString &name, const QString &path, SIMPLDataListWidgetItem* parent) :
-  m_ItemName(name)
-, m_ItemPath(path)
+SIMPLDataListWidgetItem::SIMPLDataListWidgetItem(const QString &arrayPath, SIMPLDataListWidgetItem* parent) :
+  m_ArrayPath(arrayPath)
 , m_ParentItem(parent)
 , m_ItemTooltip("")
 , m_Icon(QIcon())
@@ -102,6 +101,8 @@ bool SIMPLDataListWidgetItem::insertChild(int position, SIMPLDataListWidgetItem*
 // -----------------------------------------------------------------------------
 bool SIMPLDataListWidgetItem::insertChildren(int position, int count, int columns)
 {
+  Q_UNUSED(columns)
+
   if(position < 0 || position > m_ChildItems.size())
   {
     return false;
@@ -109,7 +110,7 @@ bool SIMPLDataListWidgetItem::insertChildren(int position, int count, int column
 
   for(int row = 0; row < count; ++row)
   {
-    SIMPLDataListWidgetItem* item = new SIMPLDataListWidgetItem("", "", this);
+    SIMPLDataListWidgetItem* item = new SIMPLDataListWidgetItem("", this);
     insertChild(position, item);
   }
 
@@ -182,6 +183,23 @@ QIcon SIMPLDataListWidgetItem::getIcon()
 bool SIMPLDataListWidgetItem::setIcon(const QIcon& icon)
 {
   m_Icon = icon;
+  return true;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QString SIMPLDataListWidgetItem::getArrayPath()
+{
+  return m_ArrayPath;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool SIMPLDataListWidgetItem::setArrayPath(const QString& path)
+{
+  m_ArrayPath = path;
   return true;
 }
 

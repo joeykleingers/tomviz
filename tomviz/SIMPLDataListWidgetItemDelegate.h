@@ -49,8 +49,8 @@ class SIMPLDataListWidgetItemDelegate : public QStyledItemDelegate
 
     virtual ~SIMPLDataListWidgetItemDelegate();
 
-  protected:
     void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const Q_DECL_OVERRIDE;
+    QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const Q_DECL_OVERRIDE;
 
   private:
 

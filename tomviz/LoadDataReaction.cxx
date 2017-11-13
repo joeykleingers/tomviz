@@ -18,6 +18,7 @@
 #include "ActiveObjects.h"
 #include "DataSource.h"
 #include "EmdFormat.h"
+#include "SIMPLFormat.h"
 #include "ModuleManager.h"
 #include "RAWFileReaderDialog.h"
 #include "RecentFilesMenu.h"
@@ -48,10 +49,6 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
-#include "SIMPLib/Utilities/SIMPLH5DataReader.h"
-#include "SIMPLib/DataContainers/DataContainerArrayProxy.h"
-#include "SIMPLib/DataContainers/DataContainerArray.h"
-
 namespace tomviz {
 
 LoadDataReaction::LoadDataReaction(QAction* parentObject)
@@ -75,7 +72,7 @@ QList<DataSource*> LoadDataReaction::loadData()
   QStringList filters;
   filters
     << "Common file types (*.emd *.jpg *.jpeg *.png *.tiff *.tif *.raw"
-       " *.dat *.bin *.txt *.mhd *.mha *.vti *.mrc *.st *.rec *.ali *.xmf *.xdmf)"
+       " *.dat *.bin *.txt *.mhd *.mha *.vti *.mrc *.st *.rec *.ali *.xmf *.xdmf *.dream3d)"
     << "EMD (*.emd)"
     << "JPeg Image files (*.jpg *.jpeg)"
     << "PNG Image files (*.png)"
@@ -195,18 +192,17 @@ DataSource* LoadDataReaction::createSIMPLDataSource(const QString& fileName,
                                                     bool defaultModules,
                                                     bool child)
 {
-  vtkSmartPointer<vtkSMProxy> source;
-  SIMPLH5DataReader* simplReader = new SIMPLH5DataReader();
-  simplReader->openFile(fileName);
-  DataContainerArrayProxy proxy;
-  DataContainerArray::Pointer dca = DataContainerArray::New();
-  simplReader->readDataContainerArrayStructure(proxy);
-  if (simplReader->readDREAM3DData(false, proxy, dca.get()) == false)
-  {
-
+  SIMPLFormat simplFile;
+  vtkNew<vtkImageData> imageData;
+  if (simplFile.read(fileName.toLatin1().data(), imageData.Get())) {
+    DataSource* dataSource = createDataSource(imageData.Get());
+    dataSource->originalDataSource()->SetAnnotation(
+      Attributes::FILENAME, fileName.toLatin1().data());
+    LoadDataReaction::dataSourceAdded(dataSource, defaultModules, child);
+    return dataSource;
   }
 
-  simplReader->closeFile();
+  return nullptr;
 }
 
 namespace {

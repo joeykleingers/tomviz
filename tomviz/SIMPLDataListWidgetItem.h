@@ -47,15 +47,11 @@
 class SIMPLDataListWidgetItem
 {
   public:
-    SIMPLDataListWidgetItem(const QString &name, const QString &path = QString(), SIMPLDataListWidgetItem* parent = 0);
+    SIMPLDataListWidgetItem(const QString &arrayPath, SIMPLDataListWidgetItem* parent = 0);
     virtual ~SIMPLDataListWidgetItem();
 
     static const int DefaultColumn = 0;
     static const int DefaultColumnCount = 1;
-
-    SIMPL_INSTANCE_PROPERTY(QString, ItemName)
-    SIMPL_INSTANCE_PROPERTY(QString, ItemParentPath)
-    SIMPL_INSTANCE_PROPERTY(QString, ItemPath)
 
     SIMPLDataListWidgetItem* child(int number);
     SIMPLDataListWidgetItem* parent();
@@ -67,6 +63,9 @@ class SIMPLDataListWidgetItem
 
     QIcon getIcon();
     bool setIcon(const QIcon& icon);
+
+    QString getArrayPath();
+    bool setArrayPath(const QString& path);
 
     bool insertChild(int position, SIMPLDataListWidgetItem* child);
     bool insertChildren(int position, int count, int columns);
@@ -81,8 +80,9 @@ class SIMPLDataListWidgetItem
   private:
     QList<SIMPLDataListWidgetItem*>               m_ChildItems;
     SIMPLDataListWidgetItem*                      m_ParentItem;
-    QString                                     m_ItemTooltip;
-    QIcon                                       m_Icon;
+    QString                                       m_ItemTooltip;
+    QIcon                                         m_Icon;
+    QString                                       m_ArrayPath;
 
     SIMPLDataListWidgetItem(const SIMPLDataListWidgetItem&);    // Copy Constructor Not Implemented
     void operator=(const SIMPLDataListWidgetItem&);  // Operator '=' Not Implemented

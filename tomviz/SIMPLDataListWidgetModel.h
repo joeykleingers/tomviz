@@ -59,11 +59,8 @@ class SIMPLDataListWidgetModel : public QAbstractListModel
     ~SIMPLDataListWidgetModel();
 
     QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
-    QString itemName(const QModelIndex &index);
-    QString itemParentPath(const QModelIndex &index);
-    QString itemPath(const QModelIndex &index);
+    QString getArrayPath(const QModelIndex& index);
 
     bool isEmpty();
 
@@ -91,7 +88,7 @@ class SIMPLDataListWidgetModel : public QAbstractListModel
 
     QModelIndex getIndex(const SIMPLDataListWidgetItem* item) const;
 
-    SIMPLDataListWidgetItem* insertItem(const int row, const QString &displayName, const QString &displayPath, const QString &fullPath, SIMPLDataListWidgetItem* headerItem = nullptr);
+    SIMPLDataListWidgetItem* insertItem(const int row, const QString &arrayPath, SIMPLDataListWidgetItem* headerItem = nullptr);
     void removeItem(const int row, SIMPLDataListWidgetItem* headerItem = nullptr);
 
     SIMPLDataListWidgetModel(const SIMPLDataListWidgetModel&);    // Copy Constructor Not Implemented

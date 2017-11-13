@@ -38,6 +38,10 @@
 
 #include <QtWidgets/QDialog>
 
+#include "SIMPLib/DataContainers/DataArrayPath.h"
+
+#include "SIMPLib/Common/SIMPLibSetGetMacros.h"
+
 namespace Ui {
 class SIMPLDataSelectionDialog;
 }
@@ -45,12 +49,31 @@ namespace tomviz {
 
 class SIMPLDataSelectionDialog : public QDialog
 {
+  Q_OBJECT
+
   public:
-    SIMPLDataSelectionDialog(QWidget* parent = nullptr);
+    SIMPL_SHARED_POINTERS(SIMPLDataSelectionDialog)
+
+    static Pointer New(QWidget* parent = nullptr)
+    {
+      return Pointer(new SIMPLDataSelectionDialog(parent));
+    }
+
     virtual ~SIMPLDataSelectionDialog();
+
+    void setDataArrayPaths(QList<DataArrayPath> daPaths);
+
+    QString getSelectedDataArrayPath();
+
+    void setupGui();
+
+  protected:
+    SIMPLDataSelectionDialog(QWidget* parent = nullptr);
 
   private:
     QScopedPointer<Ui::SIMPLDataSelectionDialog> m_ui;
+
+    void createConnections();
 
     SIMPLDataSelectionDialog(const SIMPLDataSelectionDialog&);    // Copy Constructor Not Implemented
     void operator=(const SIMPLDataSelectionDialog&);  // Operator '=' Not Implemented

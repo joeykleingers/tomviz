@@ -37,6 +37,8 @@
 
 #include <QtCore/QFileInfo>
 
+#include <QtGui/QAbstractTextDocumentLayout>
+
 #include <QtWidgets/QLineEdit>
 
 #include <QtGui/QTextDocument>
@@ -66,22 +68,42 @@ SIMPLDataListWidgetItemDelegate::~SIMPLDataListWidgetItemDelegate()
 // -----------------------------------------------------------------------------
 void SIMPLDataListWidgetItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-//  QStyleOptionViewItemV4 options = option;
-//  initStyleOption(&options, index);
+  QStyleOptionViewItemV4 options = option;
+  initStyleOption(&options, index);
 
-//  painter->save();
+  painter->save();
 
-//  QTextDocument doc;
-//  doc.setHtml(options.text);
+  QTextDocument doc;
+  doc.setHtml(options.text);
 
-//  options.text = "";
-//  options.widget->style()->drawControl(QStyle::CE_ItemViewItem, &options, painter);
+  options.text = "";
+  options.widget->style()->drawControl(QStyle::CE_ItemViewItem, &options, painter);
 
-//  painter->translate(options.rect.left(), options.rect.top());
-//  QRect clip(0, 0, options.rect.width(), options.rect.height());
-//  doc.drawContents(painter, clip);
+  // Shift text right to make icon visible
+  QSize iconSize = options.icon.actualSize(options.rect.size());
+  painter->translate(options.rect.left()+iconSize.width(), options.rect.top());
+  QRect clip(0, 0, options.rect.width()+iconSize.width(), options.rect.height());
 
-//  painter->restore();
+  //doc.drawContents(painter, clip);
 
-  QStyledItemDelegate::paint(painter, option, index);
+  painter->setClipRect(clip);
+  QAbstractTextDocumentLayout::PaintContext ctx;
+  // Set text color to white for selected item
+  if (option.state & QStyle::State_Selected)
+    ctx.palette.setColor(QPalette::Text, QColor("white"));
+  ctx.clip = clip;
+  doc.documentLayout()->draw(painter, ctx);
+
+  painter->restore();
+}
+
+QSize SIMPLDataListWidgetItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
+{
+  QStyleOptionViewItem options = option;
+  initStyleOption(&options, index);
+
+  QTextDocument doc;
+  doc.setHtml(options.text);
+  doc.setTextWidth(options.rect.width());
+  return QSize(doc.idealWidth(), doc.size().height());
 }

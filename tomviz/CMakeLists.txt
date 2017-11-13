@@ -186,6 +186,8 @@ set(SOURCES
   SIMPLDataListWidgetModel.h
   SIMPLDataSelectionDialog.cxx
   SIMPLDataSelectionDialog.h
+  SIMPLFormat.cxx
+  SIMPLFormat.h
   SnapshotOperator.h
   SnapshotOperator.cxx
   SpinBox.cxx

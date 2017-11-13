@@ -34,6 +34,10 @@
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 #include "SIMPLDataSelectionDialog.h"
+
+#include "SIMPLDataListWidgetModel.h"
+#include "SIMPLDataListWidgetItemDelegate.h"
+
 #include "ui_SIMPLDataSelectionDialog.h"
 
 namespace tomviz {
@@ -42,12 +46,72 @@ SIMPLDataSelectionDialog::SIMPLDataSelectionDialog(QWidget* parent) :
   QDialog(parent),
   m_ui(new Ui::SIMPLDataSelectionDialog)
 {
+  m_ui->setupUi(this);
 
+  setupGui();
 }
 
 SIMPLDataSelectionDialog::~SIMPLDataSelectionDialog()
 {
 
+}
+
+void SIMPLDataSelectionDialog::setupGui()
+{
+  SIMPLDataListWidgetItemDelegate* delegate = new SIMPLDataListWidgetItemDelegate(m_ui->listView);
+  m_ui->listView->setItemDelegate(delegate);
+
+//  m_ui->importBtn->setEnabled(false);
+
+  createConnections();
+}
+
+void SIMPLDataSelectionDialog::setDataArrayPaths(QList<DataArrayPath> daPaths)
+{
+  QAbstractItemModel* oldModel = m_ui->listView->model();
+  if (oldModel != nullptr)
+  {
+    delete oldModel;
+  }
+
+  SIMPLDataListWidgetModel* model = new SIMPLDataListWidgetModel();
+  model->insertColumn(0);
+  for (int i = 0; i < daPaths.size(); i++)
+  {
+    DataArrayPath daPath = daPaths[i];
+    QString path = daPath.serialize("/");
+
+    int row = model->rowCount();
+    model->insertRow(row);
+    model->setData(model->index(row, 0), path, Qt::DisplayRole);
+  }
+
+  m_ui->listView->setModel(model);
+}
+
+void SIMPLDataSelectionDialog::createConnections()
+{
+  connect(m_ui->importBtn, &QPushButton::clicked, [=] { accept(); });
+  connect(m_ui->cancelBtn, &QPushButton::clicked, [=] { reject(); });
+
+//  connect(m_ui->listView->selectionModel(), &QItemSelectionModel::currentChanged, this, [=] (const QModelIndex &cur, const QModelIndex &prev) {
+//    Q_UNUSED(prev)
+
+//    m_ui->importBtn->setEnabled(cur.isValid());
+//  });
+}
+
+QString SIMPLDataSelectionDialog::getSelectedDataArrayPath()
+{
+  QModelIndex index = m_ui->listView->currentIndex();
+  SIMPLDataListWidgetModel* model = dynamic_cast<SIMPLDataListWidgetModel*>(m_ui->listView->model());
+  if (model == nullptr)
+  {
+    return QString();
+  }
+
+  QString daPath = model->getArrayPath(index);
+  return daPath;
 }
 
 }

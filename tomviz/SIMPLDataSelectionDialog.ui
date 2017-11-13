@@ -48,14 +48,14 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="cancelBtn">
        <property name="text">
         <string>Cancel</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="importBtn">
        <property name="text">
         <string>Import</string>
        </property>

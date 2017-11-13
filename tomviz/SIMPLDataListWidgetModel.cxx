@@ -35,6 +35,8 @@
 
 #include "SIMPLDataListWidgetModel.h"
 
+#include "SIMPLib/DataContainers/DataArrayPath.h"
+
 #include <QtWidgets>
 
 // -----------------------------------------------------------------------------
@@ -43,7 +45,7 @@
 SIMPLDataListWidgetModel::SIMPLDataListWidgetModel(QObject* parent)
 : QAbstractListModel(parent)
 {
-  m_RootItem = new SIMPLDataListWidgetItem("", "");
+  m_RootItem = new SIMPLDataListWidgetItem("");
 }
 
 // -----------------------------------------------------------------------------
@@ -57,7 +59,7 @@ SIMPLDataListWidgetModel::~SIMPLDataListWidgetModel()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-SIMPLDataListWidgetItem* SIMPLDataListWidgetModel::insertItem(const int row, const QString &displayName, const QString &displayPath, const QString &fullPath, SIMPLDataListWidgetItem *headerItem)
+SIMPLDataListWidgetItem* SIMPLDataListWidgetModel::insertItem(const int row, const QString &arrayPath, SIMPLDataListWidgetItem *headerItem)
 {
   int rowPos;
   if (headerItem)
@@ -73,9 +75,7 @@ SIMPLDataListWidgetItem* SIMPLDataListWidgetModel::insertItem(const int row, con
 
   QModelIndex newNameIndex = index(rowPos, SIMPLDataListWidgetItem::DefaultColumn, QModelIndex());
   SIMPLDataListWidgetItem* newItem = getItem(newNameIndex);
-  newItem->setItemName(displayName);
-  newItem->setItemParentPath(displayPath);
-  newItem->setItemPath(fullPath);
+  newItem->setArrayPath(arrayPath);
 
   return newItem;
 }
@@ -112,10 +112,10 @@ QVariant SIMPLDataListWidgetModel::data(const QModelIndex& index, int role) cons
 
   if(role == Qt::DisplayRole)
   {
-    QString itemName = item->getItemName();
-    QString displayStr = itemName;
-    QString pathName = item->getItemPath();
-    displayStr.append("\n" + pathName);
+    QString arrayPath = item->getArrayPath();
+    DataArrayPath daPath = DataArrayPath::Deserialize(arrayPath, "/");
+    QString displayStr = "<b>" + daPath.getDataArrayName() + "</b>";
+    displayStr.append("<br>" + arrayPath);
 
     return displayStr;
   }
@@ -132,7 +132,6 @@ QVariant SIMPLDataListWidgetModel::data(const QModelIndex& index, int role) cons
     QModelIndex nameIndex = this->index(index.row(), SIMPLDataListWidgetItem::DefaultColumn, index.parent());
     if(nameIndex == index)
     {
-      SIMPLDataListWidgetItem* item = getItem(index);
       return item->getIcon();
     }
     else
@@ -149,43 +148,10 @@ QVariant SIMPLDataListWidgetModel::data(const QModelIndex& index, int role) cons
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QString SIMPLDataListWidgetModel::itemName(const QModelIndex &index)
+QString SIMPLDataListWidgetModel::getArrayPath(const QModelIndex& index)
 {
-  if (index.isValid() == true)
-  {
-    SIMPLDataListWidgetItem* item = getItem(index);
-    return item->getItemName();
-  }
-
-  return QString();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-QString SIMPLDataListWidgetModel::itemParentPath(const QModelIndex &index)
-{
-  if (index.isValid() == true)
-  {
-    SIMPLDataListWidgetItem* item = getItem(index);
-    return item->getItemParentPath();
-  }
-
-  return QString();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-QString SIMPLDataListWidgetModel::itemPath(const QModelIndex &index)
-{
-  if (index.isValid() == true)
-  {
-    SIMPLDataListWidgetItem* item = getItem(index);
-    return item->getItemPath();
-  }
-
-  return QString();
+  SIMPLDataListWidgetItem* item = getItem(index);
+  return item->getArrayPath();
 }
 
 // -----------------------------------------------------------------------------
@@ -234,19 +200,6 @@ QModelIndex SIMPLDataListWidgetModel::getIndex(const SIMPLDataListWidgetItem* it
   }
 
   return QModelIndex();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-QVariant SIMPLDataListWidgetModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-  if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
-  {
-    return m_RootItem->getItemName();
-  }
-
-  return QVariant();
 }
 
 // -----------------------------------------------------------------------------
@@ -364,7 +317,11 @@ bool SIMPLDataListWidgetModel::setData(const QModelIndex& index, const QVariant&
   SIMPLDataListWidgetItem* item = getItem(index);
   bool result = false;
 
-  if(role == Qt::DecorationRole)
+  if (role == Qt::DisplayRole)
+  {
+    result = item->setArrayPath(value.toString());
+  }
+  else if(role == Qt::DecorationRole)
   {
     result = item->setIcon(value.value<QIcon>());
   }
