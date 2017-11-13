@@ -59,6 +59,13 @@ bool SIMPLFormat::read(const QString &fileName, vtkImageData* image)
   }
 
   QStringList pathStrs = proxy.flattenHeirarchy();
+  if (pathStrs.isEmpty())
+  {
+    std::cout << QObject::tr("The DREAM.3D file '%1' does not "
+                             "contain a 1-component array with an image geometry.").arg(fileName).toStdString() << endl;
+    return false;
+  }
+
   QList<DataArrayPath> dataArrayPaths;
   for (int i = 0; i < pathStrs.size(); i++)
   {
