@@ -68,7 +68,7 @@ SIMPLDataListWidgetItemDelegate::~SIMPLDataListWidgetItemDelegate()
 // -----------------------------------------------------------------------------
 void SIMPLDataListWidgetItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-  QStyleOptionViewItemV4 options = option;
+  QStyleOptionViewItem options = option;
   initStyleOption(&options, index);
 
   painter->save();
@@ -77,14 +77,13 @@ void SIMPLDataListWidgetItemDelegate::paint(QPainter* painter, const QStyleOptio
   doc.setHtml(options.text);
 
   options.text = "";
+  options.rect.setHeight(40);
   options.widget->style()->drawControl(QStyle::CE_ItemViewItem, &options, painter);
 
   // Shift text right to make icon visible
   QSize iconSize = options.icon.actualSize(options.rect.size());
   painter->translate(options.rect.left()+iconSize.width(), options.rect.top());
   QRect clip(0, 0, options.rect.width()+iconSize.width(), options.rect.height());
-
-  //doc.drawContents(painter, clip);
 
   painter->setClipRect(clip);
   QAbstractTextDocumentLayout::PaintContext ctx;
@@ -97,6 +96,9 @@ void SIMPLDataListWidgetItemDelegate::paint(QPainter* painter, const QStyleOptio
   painter->restore();
 }
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 QSize SIMPLDataListWidgetItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
   QStyleOptionViewItem options = option;
@@ -105,5 +107,7 @@ QSize SIMPLDataListWidgetItemDelegate::sizeHint ( const QStyleOptionViewItem & o
   QTextDocument doc;
   doc.setHtml(options.text);
   doc.setTextWidth(options.rect.width());
-  return QSize(doc.idealWidth(), doc.size().height());
+  qreal width = doc.idealWidth();
+  qreal height = doc.size().height();
+  return QSize(width, height);
 }
