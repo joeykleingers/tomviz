@@ -236,15 +236,34 @@ void RecentFilesMenu::dataSourceTriggered(QAction* actn, bool stack)
         return;
       }
       if (node.attribute("xmlgroup").empty()) {
-        // Special node for EMDs that have no proxy.
-        if (LoadDataReaction::createDataSourceLocal(
-              node.attribute("filename0").as_string())) {
-          // reorder the nodes to move the recently opened file to the top.
-          root.prepend_copy(node);
-          root.remove_child(node);
-          save_settings(settings);
-          return;
+        QString filePath = QString::fromStdString(std::string(node.attribute("filename0").as_string()));
+        QFileInfo fi(filePath);
+        QString ext = fi.completeSuffix();
+        if (ext == "dream3d")
+        {
+          // DREAM3D file
+          if (LoadDataReaction::createSIMPLDataSource(
+                node.attribute("filename0").as_string())) {
+            // reorder the nodes to move the recently opened file to the top.
+            root.prepend_copy(node);
+            root.remove_child(node);
+            save_settings(settings);
+            return;
+          }
         }
+        else if (ext == "emd")
+        {
+          // Special node for EMDs that have no proxy.
+          if (LoadDataReaction::createDataSourceLocal(
+                node.attribute("filename0").as_string())) {
+            // reorder the nodes to move the recently opened file to the top.
+            root.prepend_copy(node);
+            root.remove_child(node);
+            save_settings(settings);
+            return;
+          }
+        }
+
         // failed to create reader, remove the node.
         root.remove_child(node);
         save_settings(settings);
