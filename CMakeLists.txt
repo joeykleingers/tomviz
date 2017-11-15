@@ -121,6 +121,7 @@ endif()
 find_package(HDF5)
 find_package(SIMPL)
 
+option(TOMVIZ_ENABLE_RPC "Enable RPC server" OFF)
 
 add_subdirectory(tomviz)
 
