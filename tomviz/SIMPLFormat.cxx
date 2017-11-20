@@ -51,7 +51,10 @@ bool SIMPLFormat::read(const QString &fileName, vtkImageData* image)
   simplReader->openFile(fileName);
 
   int err = 0;
-  SIMPLH5DataReaderRequirements req(SIMPL::Defaults::AnyPrimitive, 1, AttributeMatrix::Type::Any, IGeometry::Type::Image);
+  SIMPLH5DataReaderRequirements req(1);
+  req.setPrimitiveTypeFlags(req.getPrimitiveTypeFlags() & ~SIMPLH5DataReaderRequirements::PrimitiveTypeFlag::StringArray_PType);
+  req.setAMTypeFlags(SIMPLH5DataReaderRequirements::AMTypeFlag::Any_AMType);
+  req.setDCGeometryTypeFlags(SIMPLH5DataReaderRequirements::DCGeometryTypeFlag::Image_DCGeomType);
   DataContainerArrayProxy proxy = simplReader->readDataContainerArrayStructure(req, err);
   if (err < 0)
   {
