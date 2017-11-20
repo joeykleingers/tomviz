@@ -42,10 +42,10 @@
 //
 // -----------------------------------------------------------------------------
 SIMPLDataListWidgetItem::SIMPLDataListWidgetItem(const QString &arrayPath, SIMPLDataListWidgetItem* parent) :
-  m_ArrayPath(arrayPath)
-, m_ParentItem(parent)
+ m_ParentItem(parent)
 , m_ItemTooltip("")
 , m_Icon(QIcon())
+, m_ArrayPath(arrayPath)
 {
 
 }
